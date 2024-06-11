@@ -1,35 +1,27 @@
 name: cron workflow
-
 on:
-  schedule:
-    - cron: "1/3 * * * *" #This runs the workflow every day at midnight
-
+  push:
+    branches:
+      - 'master'
 jobs:
-  create-pr:
-    runs-on: self-hosted
+  productionPromotion:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
           ref: default_branch
-
-      - name: Create commits
+      - name: Setup Github User
+        uses: fregante/setup-git-user@v2
+      - name: Reset promotion branch
         run: |
-          date +%s > report.txt
-          git commit -am "Modify tracked file during workflow"
-          date +%s > new-report.txt
-          git add -A
-          git commit -m "Add untracked file during workflow"
-          - name: Uncommitted change
-            run: date +%s > report.txt
-      - name: Create PR
+          git fetch origin master:master
+          git rebase -X ours origin/master default_branch
+      - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Automated PR"
-          body: "This is a PR automatically created"
-          branch: "default_branch"
+          branch: default_branch
+          base: master
       - name: Check outputs
         if: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
