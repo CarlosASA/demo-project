@@ -20,3 +20,8 @@ jobs:
           title: "Automated PR"
           body: "This is a PR automatically created"
           branch: "default_branch"
+      - name: Check outputs
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
