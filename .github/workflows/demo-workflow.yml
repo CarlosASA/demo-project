@@ -1,0 +1,21 @@
+name: cron workflow
+
+on:
+  schedule:
+    - cron: "1/10 * * * *" #This runs the workflow every day at midnight
+
+jobs:
+  create-pr:
+    runs-on: kubernetes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: demo-branch
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: "Automated PR"
+          body: "This is a PR automatically created"
+          branch: "default_branch"
