@@ -2,17 +2,27 @@ name: cron workflow
 
 on:
   schedule:
-    - cron: "1/10 * * * *" #This runs the workflow every day at midnight
+    - cron: "1/3 * * * *" #This runs the workflow every day at midnight
 
 jobs:
   create-pr:
     runs-on: self-hosted
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          ref: master
+          fetch-depth: 0
+          ref: default_branch
 
+      - name: Create commits
+        run: |
+          date +%s > report.txt
+          git commit -am "Modify tracked file during workflow"
+          date +%s > new-report.txt
+          git add -A
+          git commit -m "Add untracked file during workflow"
+          - name: Uncommitted change
+            run: date +%s > report.txt
       - name: Create PR
         uses: peter-evans/create-pull-request@v6
         with:
